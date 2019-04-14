@@ -14,12 +14,5 @@ export default (): Sample[] => {
     samples[0] = new Sample(upperBounds);
     samples[1] = new Sample(lowerBounds);
 
-    while(samples.length < config.p) {
-        k++;
-        const r = Math.random();
-
-        break;
-    }
-
     return samples.splice(0, config.p);
 }
