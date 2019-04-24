@@ -3,7 +3,7 @@ import {
     rastrigin,
 } from './libs/functions';
 
-const n = 2;
+const n = 8;
 
 const upperBounds = [];
 
