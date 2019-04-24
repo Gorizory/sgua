@@ -29,7 +29,7 @@ export default (): Sample[] => {
             }
 
             for (let j = 0; j < n; j++) {
-                if (j >= part) {
+                if (j > part - 1) {
                     part += n / k;
                     linearCombination = linearCombination.slice(1);
                 }
