@@ -31,29 +31,25 @@ export default (garden: Sample[]): Sample[] => {
     const g2 = [];
     const g3 = [];
 
+    // Mating
     garden.forEach((s1, index1) => {
-        // Mating
         garden.forEach((s2, index2) => {
             if (index1 === index2) {
                 return;
             }
 
-            const pm = matingP(s1, s2);
-            const G = [];
-            const H = [];
-
-            for (let i = 0; i < n; i++) {
-                if (pm <= Math.random()) {
-                    G.push(s1[i] + s2[i]);
-                    H.push(s2[i] + s1[i]);
-                } else {
-                    G.push(g1[i]);
-                    H.push(s2[i]);
+            if (matingP(s1, s2) <= Math.random()) {
+                const newSampleVariables = [];
+                const l = Math.floor(Math.random() * n);
+                for (let i = 0; i < n; i++) {
+                    if (i <= l) {
+                        newSampleVariables.push(s1._variables[i]);
+                    } else {
+                        newSampleVariables.push(s2._variables[i]);
+                    }
                 }
+                g1.push(new Sample(newSampleVariables));
             }
-
-            g1.push(new Sample(G));
-            g1.push(new Sample(H));
         });
     });
 
