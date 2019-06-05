@@ -1,8 +1,8 @@
 import cultivation from './stages/cultivation';
 import growing from './stages/growing';
 
-let samples = cultivation();
+let garden = cultivation();
 
-samples = growing(samples);
+garden = growing(garden);
 
-console.log(samples)
+console.log(garden)

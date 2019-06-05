@@ -22,5 +22,6 @@ export default {
     dt: 30,
     df: 10e-5,
     dx: 10e-2,
+    similarityEps: 0.5,
     function: spheric,
 };
