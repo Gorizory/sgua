@@ -11,7 +11,8 @@ class Sample {
         }
 
         this.isBranch = this.isBranch.bind(this);
-
+        this.growBranch = this.growBranch.bind(this);
+        this.print = this.print.bind(this);
     }
 
     get variables(): number[] {
@@ -31,6 +32,11 @@ class Sample {
 
     isBranch(branch: number): boolean {
         return this._branches[branch];
+    }
+
+    print(): void {
+        console.log(this._variables);
+        console.log(`${this._f}\n\n`);
     }
 }
 

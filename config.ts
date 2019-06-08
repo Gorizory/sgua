@@ -1,14 +1,15 @@
-import {
-    spheric,
-    rastrigin,
-} from './libs/functions';
+import * as functions from './libs/functions';
 
-const n = 8;
+enum functionNames {
+    Spheric = 'spheric',
+    Rastrigin = 'rastrigin',
+}
+
+const n = 32;
+const functionName = functionNames.Rastrigin;
 
 const upperBounds = [];
-
 const lowerBounds = [];
-
 for (let i = 0; i < n; i++) {
     upperBounds.push(2.5);
     lowerBounds.push(-2.5);
@@ -23,5 +24,7 @@ export default {
     df: 10e-5,
     dx: 10e-2,
     similarityEps: 0.5,
-    function: spheric,
+    function: functions[functionName],
+    functionName,
+    multistart: 1,
 };
