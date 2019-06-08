@@ -46,7 +46,7 @@ if (cluster.isMaster) {
             initWorker(workersCount)
         }
         if (Object.values(cluster.workers).length === 0) {
-            fs.writeFileSync(`${analysisPath}/results_${n}_test.csv`, stringForFile);
+            fs.writeFileSync(`${analysisPath}/results_${n}.csv`, stringForFile);
             process.exit();
         }
     });

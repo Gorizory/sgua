@@ -5,7 +5,7 @@ enum functionNames {
     Rastrigin = 'rastrigin',
 }
 
-const n = 8;
+const n = 64;
 const functionName = functionNames.Rastrigin;
 
 const upperBounds = [];
