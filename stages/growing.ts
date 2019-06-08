@@ -35,7 +35,7 @@ function similarity(s1: Sample, s2: Sample) {
     return sim;
 }
 
-export default (garden: Sample[]): Sample[] => {
+export default (garden: Sample[]): {garden: Sample[], fCount: number} => {
     const g1 = [];
     const g2 = [];
     const g3 = [];
@@ -103,11 +103,14 @@ export default (garden: Sample[]): Sample[] => {
         });
     });
 
-    return _.sortBy([
-        ...garden,
-        ...g1,
-        ...g2,
-        ...g3,
-    ], sample => sample.f).splice(0, p)
+    return {
+        garden: _.sortBy([
+            ...garden,
+            ...g1,
+            ...g2,
+            ...g3,
+        ], sample => sample.f).splice(0, p),
+        fCount: g1.length + g2.length + g3.length,
+    };
 }
 

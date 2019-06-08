@@ -5,7 +5,7 @@ enum functionNames {
     Rastrigin = 'rastrigin',
 }
 
-const n = 32;
+const n = 8;
 const functionName = functionNames.Rastrigin;
 
 const upperBounds = [];
@@ -26,5 +26,5 @@ export default {
     similarityEps: 0.5,
     function: functions[functionName],
     functionName,
-    multistart: 1,
+    multistart: 100,
 };

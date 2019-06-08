@@ -1,4 +1,6 @@
+const cluster = require('cluster');
 const fs = require('fs');
+const os = require('os');
 
 import config from './config';
 import Sample from './Sample';
@@ -11,60 +13,80 @@ const {
     df,
     dx,
     multistart,
-    functionName,
 } = config;
 
-const functionPath = `./${functionName}`;
-if (!fs.existsSync(functionPath)) {
-    fs.mkdirSync(functionPath);
-}
-const nPath = `${functionPath}/${n}`;
-if (!fs.existsSync(nPath)) {
-    fs.mkdirSync(nPath);
+const analysisPath = './analysis';
+if (!fs.existsSync(analysisPath)) {
+    fs.mkdirSync(analysisPath);
 }
 
-for (let i = 0; i < multistart; i++) {
-    const iterationPath = `${nPath}/${i}`;
-    if (!fs.existsSync(iterationPath)) {
-        fs.mkdirSync(iterationPath);
+if (cluster.isMaster) {
+    let workersCount = 0;
+    function initWorker(i) {
+        const worker = cluster.fork();
+        worker.send(i);
+        workersCount++;
+        console.log(workersCount);
+
+        worker.on('message', (msg) => {
+            stringForFile = `${stringForFile}${msg}`;
+        });
     }
 
-    const bestSamples: Sample[] = [];
+    const processors = os.cpus().length;
+    const maxProcesses = processors > 4 ?  processors - 4 : 1;
+    for (let i = 0; i < maxProcesses; i++) {
+        initWorker(i);
+    }
+
     let stringForFile = '';
-    let iteration = 0;
 
-    let garden = cultivation();
+    cluster.on('exit', () => {
+        if (multistart - workersCount > 0) {
+            initWorker(workersCount)
+        }
+        if (Object.values(cluster.workers).length === 0) {
+            fs.writeFileSync(`${analysisPath}/results_${n}_test.csv`, stringForFile);
+            process.exit();
+        }
+    });
+} else {
+    process.on('message', (i) => {
+        const bestSamples: Sample[] = [];
+        let iteration = 0;
+        let fCount = 0;
 
-    while (bestSamples.length < dt || (bestSamples[0].f - bestSamples[dt - 1].f) > df) {
-        iteration++;
-        garden = growing(garden);
+        let garden = cultivation();
 
-        switch (bestSamples.length) {
-            case 0:
-                bestSamples.push(garden[0]);
-                break;
+        while (bestSamples.length < dt || (bestSamples[0].f - bestSamples[dt - 1].f) > df) {
+            iteration++;
+            const {
+                garden: newGarden,
+                fCount: addFCount,
+            } = growing(garden);
 
-            case dt:
-                bestSamples.shift();
-                bestSamples.push(garden[0]);
-                break;
+            fCount += addFCount;
+            garden = newGarden;
 
-            default:
-                bestSamples.push(garden[0]);
-                break;
+            switch (bestSamples.length) {
+                case 0:
+                    bestSamples.push(garden[0]);
+                    break;
+
+                case dt:
+                    bestSamples.shift();
+                    bestSamples.push(garden[0]);
+                    break;
+
+                default:
+                    bestSamples.push(garden[0]);
+                    break;
+            }
         }
 
-        stringForFile = `${stringForFile}${iteration};${garden[0].f};\n`;
-    }
+        const goodResult = Math.sqrt(garden[0].variables.reduce((sum, value) => sum + Math.pow(value, 2), 0)) < dx;
 
-    fs.writeFileSync(`${iterationPath}/results.csv`, stringForFile);
-
-    if (Math.sqrt(garden[0].variables.reduce((sum, value) => sum + Math.pow(value, 2), 0)) < dx) {
-        console.log('Good result:');
-    } else {
-        console.log('Bad result:');
-    }
-    garden[0].print();
+        process.send(`${i};${fCount};${iteration};${goodResult ? 1 : 0};\n`);
+        process.exit();
+    });
 }
-
-
