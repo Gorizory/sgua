@@ -35,7 +35,7 @@ if (cluster.isMaster) {
 
     const processors = os.cpus().length;
     const maxProcesses = processors > 4 ?  processors - 4 : 1;
-    for (let i = 0; i < maxProcesses; i++) {
+    for (let i = 0; i < maxProcesses && i < multistart; i++) {
         initWorker(i);
     }
 
